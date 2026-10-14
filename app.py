@@ -816,7 +816,11 @@ def build_stakeholder_report_sections(
 
 def build_pdf_report(df: pd.DataFrame, spec: DashboardBlueprint, logs: list, quality: dict) -> bytes:
     def safe_text(value) -> str:
-        return str(value).encode("latin-1", "replace").decode("latin-1")
+        text = str(value).encode("latin-1", "replace").decode("latin-1")
+        words = []
+        for word in text.split():
+            words.extend(word[index:index + 30] for index in range(0, len(word), 30))
+        return " ".join(words)
 
     pdf = FPDF()
     pdf.set_auto_page_break(auto=True, margin=15)
