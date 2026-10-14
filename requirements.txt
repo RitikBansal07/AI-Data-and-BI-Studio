@@ -1,0 +1,8 @@
+streamlit
+pandas
+numpy
+plotly
+pydantic
+google-genai
+statsmodels
+fpdf2>=2.7,<3
