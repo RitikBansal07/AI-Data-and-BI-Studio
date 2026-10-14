@@ -829,18 +829,23 @@ def build_pdf_report(df: pd.DataFrame, spec: DashboardBlueprint, logs: list, qua
     pdf.set_font("Arial", "B", 18)
     pdf.cell(0, 12, "Business Performance Briefing", ln=1)
     pdf.set_font("Arial", "", 10)
-    pdf.multi_cell(0, 6, "Prepared from the uploaded records and the current dashboard filters.")
+
+    def write_text(value, height: int):
+        pdf.set_x(pdf.l_margin)
+        pdf.multi_cell(pdf.w - pdf.l_margin - pdf.r_margin, height, safe_text(value))
+
+    write_text("Prepared from the uploaded records and the current dashboard filters.", 6)
 
     def section(title: str):
         pdf.ln(3)
         pdf.set_font("Arial", "B", 13)
-        pdf.multi_cell(0, 8, safe_text(title))
+        write_text(title, 8)
         pdf.set_font("Arial", "", 10)
 
     for title, lines in sections[:2]:
         section(title)
         for line in lines:
-            pdf.multi_cell(0, 6, safe_text(f"- {line}"))
+            write_text(f"- {line}", 6)
 
     for title, values in trend_sections:
         section(title)
@@ -862,10 +867,10 @@ def build_pdf_report(df: pd.DataFrame, spec: DashboardBlueprint, logs: list, qua
     for title, lines in sections[2:]:
         section(title)
         for line in lines:
-            pdf.multi_cell(0, 6, safe_text(f"- {line}"))
+            write_text(f"- {line}", 6)
 
     section("How these figures were prepared")
-    pdf.multi_cell(0, 6, "Dashboard measures use the active filters. Trend comparisons use the first recognized date field and the most relevant available measure. Unusual-value flags are prompts to review, not proof of an error. Possible explanations above are checks to make, not confirmed causes.")
+    write_text("Dashboard measures use the active filters. Trend comparisons use the first recognized date field and the most relevant available measure. Unusual-value flags are prompts to review, not proof of an error. Possible explanations above are checks to make, not confirmed causes.", 6)
     pdf_output = pdf.output(dest="S")
     return bytes(pdf_output) if isinstance(pdf_output, (bytes, bytearray)) else pdf_output.encode("latin-1")
 
