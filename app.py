@@ -132,7 +132,9 @@ def build_data_profile(df: pd.DataFrame) -> dict:
     top_corrs = []
     if len(num_cols) >= 2:
         corr_matrix = df[num_cols].corr().abs()
-        np.fill_diagonal(corr_matrix.values, np.nan)
+        corr_values = corr_matrix.to_numpy(copy=True)
+        np.fill_diagonal(corr_values, np.nan)
+        corr_matrix = pd.DataFrame(corr_values, index=corr_matrix.index, columns=corr_matrix.columns)
         unstacked = corr_matrix.unstack().dropna().drop_duplicates()
         for (col1, col2), val in unstacked.nlargest(3).items():
             top_corrs.append(f"{col1} & {col2} (r={val:.2f})")
